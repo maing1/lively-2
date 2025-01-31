@@ -36,7 +36,7 @@ class Signup(Resource):
         
         return {"message": "User created successfully"}, 201
     
-api.add_resource(Signup, '/signup')
+api.add_resource(Signup, '/users')
     
 class Login(Resource):
     def post(self):
