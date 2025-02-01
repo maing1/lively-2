@@ -36,7 +36,7 @@ const Signup = () => {
     }),
     onSubmit: async (values) => {
       try {
-        const response = await fetch("http://localhost:5555/signup", {
+        const response = await fetch("http://localhost:5555/users", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
