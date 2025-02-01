@@ -1,25 +1,21 @@
 // src/components/NavBar.js
-// import  Link  from 'react-router-dom';
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
+import { Link } from 'react-router-dom';
+import './NavBar.css';
 
 const NavBar = () => {
     return (
-        <>
-          <Navbar bg="dark" data-bs-theme="dark">
-            <Container>
-              <Navbar.Brand href="#home">NavBar</Navbar.Brand>
-              <Nav className="me-auto">
-                <Nav.Link to="/signup">Sign Up</Nav.Link>
-                <Nav.Link to="/login">Login</Nav.Link>
-                <Nav.Link to="/feed">Feed</Nav.Link>
-                <Nav.Link to="/profile">Profile</Nav.Link>
-              </Nav>
-            </Container>
-          </Navbar>
-        </>
-  );
+        <nav className="navbar">
+            <div className="navbar-container">
+                <Link to="/" className="navbar-brand">NavBar</Link>
+                <div className="nav-links">
+                    <Link to="/signup" className="nav-link">Sign Up</Link>
+                    <Link to="/login" className="nav-link">Login</Link>
+                    <Link to="/feed" className="nav-link">Feed</Link>
+                    <Link to="/profile" className="nav-link">Profile</Link>
+                </div>
+            </div>
+        </nav>
+    );
 };
 
 export default NavBar;
