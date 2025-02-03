@@ -183,9 +183,9 @@ class Likes(Resource):
             return {"message": "Post unliked successfully!"}, 200
         return {"error": "Like not found"}, 404
 
-api.add_resource(Likes, '/likes')
+api.add_resource(Likes, '/posts/<int:post_id>/likes')
 
-class CommentOnPost(Resource):
+class Comments(Resource):
     def post(self, post_id):
         data = request.get_json()
         user_id = data.get('user_id')
@@ -207,7 +207,7 @@ class CommentOnPost(Resource):
         
         return {"message": "Comment added successfully"}, 201
     
-api.add_resource(CommentOnPost, '/post/<int:post_id>/comment')
+api.add_resource(Comments, '/posts/<int:post_id>/comments')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

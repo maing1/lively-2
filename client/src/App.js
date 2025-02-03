@@ -11,12 +11,31 @@
 // src/App.js
 
 import React from "react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom"; // Using v5 syntax
+import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
+import Logout from "./pages/Logout";
 import Feed from "./pages/Feed";
 import Profile from "./pages/Profile";
+
+// Protected Route component
+const ProtectedRoute = ({ component: Component, ...rest }) => {
+  const isAuthenticated = !!localStorage.getItem('token');
+  
+  return (
+    <Route
+      {...rest}
+      render={props =>
+        isAuthenticated ? (
+          <Component {...props} />
+        ) : (
+          <Redirect to="/login" />
+        )
+      }
+    />
+  );
+};
 
 const App = () => {
   return (
@@ -25,8 +44,9 @@ const App = () => {
       <Switch>
         <Route path="/signup" component={Signup} />
         <Route path="/login" component={Login} />
-        <Route path="/feed" component={Feed} />
-        <Route path="/profile" component={Profile} />
+        <Route path="/logout" component={Logout} />
+        <ProtectedRoute path="/feed" component={Feed} />
+        <ProtectedRoute path="/profile" component={Profile} />
       </Switch>
     </Router>
   );

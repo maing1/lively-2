@@ -45,9 +45,9 @@ def seed_data():
 
         # Seed Posts
         print("Seeding posts...")
-        post1 = Post(content="First Post!", user_id=user1.id)
-        post2 = Post(content="Second Post!", user_id=user2.id)
-        post3 = Post(content="Third Post!", user_id=user3.id)
+        post1 = Post(content="First rose of the season!", user_id=user1.id, image = "https://i.pinimg.com/originals/14/86/86/148686b4a830e06d8089db5cb1e521f4.jpg" )
+        post2 = Post(content="My fur baby!", user_id=user2.id, image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSimtZyskdR3y0AtCiHyEebU1o7mZQFOA6F0Q&s")
+        post3 = Post(content="OOTD!", user_id=user3.id, image = "https://i.pinimg.com/736x/09/56/cd/0956cde2f34c21cca779f52f4ce5c786.jpg")
 
         db.session.add_all([post1, post2, post3])
         db.session.commit()

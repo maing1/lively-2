@@ -3,11 +3,11 @@ import React from 'react';
 import { useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { useHistory } from "react-router-dom"; // React Router v5 uses useHistory
+import { useHistory } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Login = () => {
-  const history = useHistory(); // React Router v5 navigation
+  const history = useHistory(); 
   const [error, setError] = useState("");
 
   const formik = useFormik({
@@ -32,6 +32,13 @@ const Login = () => {
         }
 
         const data = await response.json();
+        
+        // Store the token in localStorage
+        localStorage.setItem('token', data.token);
+        
+        // Dispatch custom event to notify NavBar
+        window.dispatchEvent(new Event('authChange'));
+        
         alert(data.message);
         history.push("/feed"); // Redirect to feed after successful login
       } catch (error) {
