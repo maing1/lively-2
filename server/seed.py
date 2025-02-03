@@ -30,18 +30,35 @@ def seed_data():
 
         # Seed Users
         print("Seeding users...")
-        user1 = User(username="user1", email="user1@example.com")
-        user1._password_hash = "password123" 
 
-        user2 = User(username="user2", email="user2@example.com")
+        user1 = User(
+            username="user1",
+            email="user1@example.com",
+            bio="A passionate software developer who loves open-source projects.",
+            profile_picture="https://t3.ftcdn.net/jpg/02/43/12/34/360_F_243123463_zTooub557xEWABDLk0jJklDyLSGl2jrr.jpg"
+        )
+        user1._password_hash = "password123"
+
+        user2 = User(
+            username="user2",
+            email="user2@example.com",
+            bio="An aspiring data scientist exploring the world of AI and ML.",
+            profile_picture="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsNWPhXbh68-pBV7iNSR76TAgOVQRSqkuogA&s"
+        )
         user2._password_hash = "password123"
 
-        user3 = User(username="user3", email="user3@example.com")
+        user3 = User(
+            username="user3",
+            email="user3@example.com",
+            bio="A digital nomad with a love for tech and adventure.",
+            profile_picture="https://t3.ftcdn.net/jpg/05/67/87/62/360_F_567876282_iUMkcDC6CgrX8AI5Mh72VQZQqFYzv7aM.jpg"
+        )
         user3._password_hash = "password123"
 
         db.session.add_all([user1, user2, user3])
         db.session.commit()
         print("Users added to the session.")
+
 
         # Seed Posts
         print("Seeding posts...")
