@@ -19,35 +19,26 @@ import Logout from "./pages/Logout";
 import Feed from "./pages/Feed";
 import Profile from "./pages/Profile";
 
-// Protected Route component
-const ProtectedRoute = ({ component: Component, ...rest }) => {
-  const isAuthenticated = !!localStorage.getItem('token');
-  
-  return (
-    <Route
-      {...rest}
-      render={props =>
-        isAuthenticated ? (
-          <Component {...props} />
-        ) : (
-          <Redirect to="/login" />
-        )
-      }
-    />
-  );
-};
-
 const App = () => {
+  // For demo purposes, we'll use a hardcoded userId
+  const userId = 1;
+
   return (
     <Router>
-      <NavBar />
-      <Switch>
-        <Route path="/signup" component={Signup} />
-        <Route path="/login" component={Login} />
-        <Route path="/logout" component={Logout} />
-        <ProtectedRoute path="/feed" component={Feed} />
-        <ProtectedRoute path="/profile" component={Profile} />
-      </Switch>
+      <div className="app">
+        <NavBar />
+        <div className="main-content">
+          <Switch>
+            <Route exact path="/" render={() => <Redirect to="/feed" />} />
+            <Route path="/signup" component={Signup} />
+            <Route path="/login" component={Login} />
+            <Route path="/logout" component={Logout} />
+            <Route path="/feed" component={Feed} />
+            <Route path="/profile" render={(props) => <Profile {...props} userId={userId} />} />
+            <Route path="*" render={() => <Redirect to="/feed" />} />
+          </Switch>
+        </div>
+      </div>
     </Router>
   );
 };

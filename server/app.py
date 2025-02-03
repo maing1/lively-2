@@ -55,63 +55,102 @@ class Login(Resource):
         return {"message": "Login successful"}, 200
 api.add_resource(Login, '/login')
 
-class Profile(Resource):
-    def get(self, username):
-        # Fetch user by username
-        user = User.query.filter_by(username=username).first()
-        if not user:
-            return {"message": "User not found"}, 404
+# class Profile(Resource):
+#     def get(self, username):
+#         # Fetch user by username
+#         user = User.query.filter_by(username=username).first()
+#         if not user:
+#             return {"message": "User not found"}, 404
         
-        # Return user's profile data
-        profile = {
+#         # Return user's profile data
+#         profile = {
+#             "username": user.username,
+#             "bio": user.bio,
+#             "profile_picture": user.profile_picture
+#         }
+        
+#         return jsonify(profile)
+    
+#     def put(self, username):
+#         data = request.get_json()
+#         user = User.query.filter_by(username=username).first()
+        
+#         if not user:
+#             return {"message": "User not found"}, 404
+        
+#         # Update bio and profile picture if provided
+#         if 'bio' in data:
+#             user.bio = data['bio']
+#         if 'profile_picture' in data:
+#             user.profile_picture = data['profile_picture']
+        
+#         db.session.commit()
+        
+#         return {"message": "Profile updated successfully", "username": user.username}, 200
+    
+# api.add_resource(Profile, '/profile/<string:username>')
+
+class Profile(Resource):
+    def get(self, user_id):
+        """Retrieve user profile."""
+        user = User.query.get(user_id)
+        if not user:
+            return {"error": "User not found"}, 404
+
+        return {
             "username": user.username,
+            "email": user.email,
             "bio": user.bio,
             "profile_picture": user.profile_picture
-        }
-        
-        return jsonify(profile)
-    
-    def put(self, username):
-        data = request.get_json()
-        user = User.query.filter_by(username=username).first()
-        
+        }, 200
+
+    def put(self, user_id):
+        """Update user profile."""
+        user = User.query.get(user_id)
         if not user:
-            return {"message": "User not found"}, 404
-        
-        # Update bio and profile picture if provided
-        if 'bio' in data:
-            user.bio = data['bio']
-        if 'profile_picture' in data:
-            user.profile_picture = data['profile_picture']
-        
+            return {"error": "User not found"}, 404
+
+        data = request.get_json()
+        if "bio" in data:
+            user.bio = data["bio"]
+        if "profile_picture" in data:
+            user.profile_picture = data["profile_picture"]
+
         db.session.commit()
-        
-        return {"message": "Profile updated successfully", "username": user.username}, 200
+        return {"message": "Profile updated successfully"}, 200
     
-api.add_resource(Profile, '/profile/<string:username>')
+api.add_resource(Profile, "/profile/<int:user_id>")
 
 class Posts(Resource):
     def post(self):
         data = request.get_json()
-        username = data.get('username')  # Change user_id to username
+        user_id = data.get('user_id')  # Change to user_id
         content = data.get('content')
         image = data.get('image')
         
         # Basic validation
-        if not username or not content:
+        if not user_id or not content:
             return {"message": "Missing required fields"}, 400
         
-        # Fetch the user by username
-        user = User.query.filter_by(username=username).first()
+        # Fetch the user by user_id
+        user = User.query.get(user_id)
         if not user:
             return {"message": "User not found"}, 404
         
-        # Create the post with the user_id
-        new_post = Posts(user_id=user.id, content=content, image=image)
+        # Create the post
+        new_post = Post(user_id=user.id, content=content, image=image)  # Changed Posts to Post
         db.session.add(new_post)
         db.session.commit()
         
-        return {"message": "Post created successfully"}, 201
+        return {
+            "message": "Post created successfully",
+            "post": {
+                "id": new_post.id,
+                "content": new_post.content,
+                "image": new_post.image,
+                "user_id": new_post.user_id
+            }
+        }, 201
     
     def delete(self, id):
         post = Post.query.get(id)
@@ -132,7 +171,7 @@ class Feed(Resource):
             {
                 "id": post.id,
                 "user_id": post.user_id,
-                "username": post.username,  # Access the username via the Post model
+                "username": post.user.username,  # Access username through the relationship
                 "content": post.content,
                 "image": post.image,
                 "likes_count": len(post.likes),
