@@ -82,6 +82,7 @@ const Profile = ({ userId }) => {
   const [error, setError] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [newProfile, setNewProfile] = useState({ bio: "", profile_picture: "" });
+  const [newPost, setNewPost] = useState({ content: '', image: '' });
 
   // Fetch user profile
   useEffect(() => {
@@ -136,7 +137,7 @@ const Profile = ({ userId }) => {
 
   return (
     <div className="container mt-4">
-      <div className="card shadow-lg">
+      <div className="card shadow-lg mb-4">
         <div className="card-body text-center">
           <h2 className="card-title">Profile</h2>
           {profile.profile_picture ? (
@@ -188,6 +189,57 @@ const Profile = ({ userId }) => {
               </button>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* New Post Form */}
+      <div className="card shadow-lg">
+        <div className="card-body">
+          <h5 className="card-title">Create a New Post</h5>
+          <form onSubmit={async (e) => {
+            e.preventDefault();
+            try {
+              const response = await fetch('http://localhost:5555/posts', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  user_id: userId,
+                  content: newPost.content,
+                  image: newPost.image || null
+                })
+              });
+
+              if (response.ok) {
+                // Clear the form
+                setNewPost({ content: '', image: '' });
+                alert('Post created successfully!');
+              }
+            } catch (error) {
+              console.error('Error creating post:', error);
+            }
+          }}>
+            <div className="mb-3">
+              <textarea
+                className="form-control"
+                placeholder="What's on your mind?"
+                value={newPost.content}
+                onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <input
+                type="url"
+                className="form-control"
+                placeholder="Image URL (optional)"
+                value={newPost.image}
+                onChange={(e) => setNewPost({ ...newPost, image: e.target.value })}
+              />
+            </div>
+            <button type="submit" className="btn btn-primary">Post</button>
+          </form>
         </div>
       </div>
     </div>
