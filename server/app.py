@@ -185,42 +185,49 @@ class Feed(Resource):
 api.add_resource(Feed, '/feed')
 
 class Likes(Resource):
-    def post(self):
-        data = request.get_json()
-
-        user_id = data.get('user_id')
-        post_id = data.get('post_id')
-
-        if not user_id or not post_id:
-            return {"error": "Missing user_id or post_id"}, 400
-
-        user = User.query.get(user_id)
+    def post(self, post_id):
+        """Add a like to a post"""
         post = Post.query.get(post_id)
+        if not post:
+            return {"error": "Post not found"}, 404
 
-        if not user or not post:
-            return {"error": "Invalid user_id or post_id"}, 400
-
+        # For now, we'll use a hardcoded user_id since we removed authentication
+        user_id = 1  # This matches our hardcoded user in the frontend
+        
+        # Check if user already liked the post
         existing_like = Like.query.filter_by(user_id=user_id, post_id=post_id).first()
         if existing_like:
-            return {"error": "User already liked this post"}, 400
+            return {"error": "Already liked"}, 400
 
         new_like = Like(user_id=user_id, post_id=post_id)
         db.session.add(new_like)
         db.session.commit()
 
-        return {"message": "Post liked successfully!"}, 201
+        return {
+            "message": "Post liked successfully",
+            "likes_count": len(post.likes)
+        }, 201
 
-    def delete(self):
-        data = request.get_json()
-        user_id = data.get('user_id')
-        post_id = data.get('post_id')
+    def delete(self, post_id):
+        """Remove a like from a post"""
+        post = Post.query.get(post_id)
+        if not post:
+            return {"error": "Post not found"}, 404
+
+        # For now, we'll use a hardcoded user_id since we removed authentication
+        user_id = 1
 
         like = Like.query.filter_by(user_id=user_id, post_id=post_id).first()
-        if like:
-            db.session.delete(like)
-            db.session.commit()
-            return {"message": "Post unliked successfully!"}, 200
-        return {"error": "Like not found"}, 404
+        if not like:
+            return {"error": "Like not found"}, 404
+
+        db.session.delete(like)
+        db.session.commit()
+
+        return {
+            "message": "Like removed successfully",
+            "likes_count": len(post.likes)
+        }, 200
 
 api.add_resource(Likes, '/posts/<int:post_id>/likes')
 

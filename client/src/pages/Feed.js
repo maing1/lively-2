@@ -31,16 +31,21 @@ const Feed = () => {
       const response = await fetch(`http://localhost:5555/posts/${postId}/likes`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         }
       });
+      
       if (response.ok) {
-        // Update the posts state to reflect the new like count
+        const data = await response.json();
+        // Update the posts state with the new likes count from the server
         setPosts(posts.map(post => 
           post.id === postId 
-            ? { ...post, likes_count: post.likes_count + 1 }
+            ? { ...post, likes_count: data.likes_count }
             : post
         ));
+      } else {
+        const error = await response.json();
+        console.error('Error liking post:', error);
       }
     } catch (error) {
       console.error('Error liking post:', error);
@@ -52,19 +57,18 @@ const Feed = () => {
       const response = await fetch(`http://localhost:5555/posts/${postId}/comments`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ content: commentText })
+        body: JSON.stringify({ 
+          user_id: 1,  // Using the same hardcoded user_id as in the rest of the app
+          content: commentText 
+        })
       });
       if (response.ok) {
-        const newComment = await response.json();
-        // Update the posts state to include the new comment
-        setPosts(posts.map(post =>
-          post.id === postId
-            ? { ...post, comments: [...post.comments, newComment] }
-            : post
-        ));
+        // Refresh the posts to show the new comment
+        const feedResponse = await fetch('http://localhost:5555/feed');
+        const updatedPosts = await feedResponse.json();
+        setPosts(updatedPosts);
       }
     } catch (error) {
       console.error('Error adding comment:', error);

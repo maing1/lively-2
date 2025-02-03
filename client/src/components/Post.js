@@ -45,7 +45,7 @@ const Post = ({ post, onLike, onComment }) => {
             <Comment key={comment.id} comment={comment} />
           ))
         ) : (
-          <p className="text-muted small">No comments yet</p>
+          <p className="text-muted small"></p>
         )}
       </div>
       <form onSubmit={handleCommentSubmit} className="mt-3">
