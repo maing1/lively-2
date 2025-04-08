@@ -2,15 +2,20 @@ from flask import jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models import User, Post, Comment, db
 
-def init_comment_route(app, db):
-    @app.route('/posts/<int:post_id>/comments', methods=['POST'])
-    def comment(post_id):
+def init_comment_route(app):
+    @app.route('/comments', methods=['POST'])
+    @jwt_required()
+    def comment():
         data = request.get_json()
-        user_id = data.get('user_id')
+        user_id = get_jwt_identity()
+
+        post_id = data.get('post_id')
         content = data.get('content')
 
-        if not user_id or not content:
-            return {"message": "Missing required fields"}, 400
+        required_fields = ['post_id','content']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'message': f'Missing required field: {field}'}), 400
 
         post = db.session.get(Post, post_id)
         user = db.session.get(User, user_id)
