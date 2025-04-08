@@ -28,3 +28,20 @@ def init_comment_route(app):
         db.session.commit()
 
         return {"message": "Comment added successfully"}, 201
+    
+    @app.route('/comments/<int:comment_id>', methods=['DELETE'])
+    @jwt_required()
+    def delete_comment(comment_id):
+        user_id = get_jwt_identity()
+        comment = db.session.get(Comment, comment_id)
+
+        if not comment:
+            return {"message": "Comment not found"}, 404
+
+        if comment.user_id != user_id:
+            return {"message": "You do not have permission to delete this comment"}, 403
+
+        db.session.delete(comment)
+        db.session.commit()
+
+        return {"message": "Comment deleted successfully"}, 200
