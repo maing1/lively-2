@@ -10,10 +10,10 @@ from datetime import timedelta
 
 from routes.auth_route import init_auth_route
 from routes.comment_route import init_comment_route
-# from routes.feed_route import init_feed_route
-# from routes.like_route import init_like_route
+from routes.feed_route import init_feed_route
+from routes.like_route import init_like_route
 # from routes.profile_route import init_profile_route
-# from routes.post_route import init_post_route
+from routes.post_route import init_post_route
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
@@ -46,9 +46,9 @@ def index():
 # Initialize routes
 init_auth_route(app, bcrypt)
 init_comment_route(app)
-# init_feed_route(app)
-# init_like_route(app)
+init_feed_route(app)
+init_like_route(app)
 # init_profile_route(app)
-# init_post_route(app)
+init_post_route(app)
 if __name__ == '__main__':
-    app.run(port=5555, debug=True)
+    app.run(port=5000, debug=True)

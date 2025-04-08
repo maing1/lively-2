@@ -1,34 +1,40 @@
-# @app.route('/posts/<int:post_id>/likes', methods=['POST', 'DELETE'])
-# def manage_likes(post_id):
-#     post = db.session.get(Post, post_id)
-#     if not post:
-#         return {"error": "Post not found"}, 404
+from flask import jsonify, request
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from models import User, Post, Like, db
 
-#     user_id = 1  # Replace with session or JWT identity in real app
+def init_like_route(app):
+    @app.route('/posts/<int:post_id>/likes', methods=['POST', 'DELETE'])
+    @jwt_required()
+    def manage_likes(post_id):
+        post = db.session.get(Post, post_id)
+        if not post:
+            return {"error": "Post not found"}, 404
 
-#     if request.method == 'POST':
-#         existing_like = Like.query.filter_by(user_id=user_id, post_id=post_id).first()
-#         if existing_like:
-#             return {"error": "Already liked"}, 400
+        user_id =get_jwt_identity()
 
-#         new_like = Like(user_id=user_id, post_id=post_id)
-#         db.session.add(new_like)
-#         db.session.commit()
+        if request.method == 'POST':
+            existing_like = Like.query.filter_by(user_id=user_id, post_id=post_id).first()
+            if existing_like:
+                return {"error": "Already liked"}, 400
 
-#         return {
-#             "message": "Post liked successfully",
-#             "likes_count": len(post.likes)
-#         }, 201
+            new_like = Like(user_id=user_id, post_id=post_id)
+            db.session.add(new_like)
+            db.session.commit()
 
-#     if request.method == 'DELETE':
-#         like = Like.query.filter_by(user_id=user_id, post_id=post_id).first()
-#         if not like:
-#             return {"error": "Like not found"}, 404
+            return {
+                "message": "Post liked successfully",
+                "likes_count": len(post.likes)
+            }, 201
 
-#         db.session.delete(like)
-#         db.session.commit()
+        if request.method == 'DELETE':
+            like = Like.query.filter_by(user_id=user_id, post_id=post_id).first()
+            if not like:
+                return {"error": "Like not found"}, 404
 
-#         return {
-#             "message": "Like removed successfully",
-#             "likes_count": len(post.likes)
-#         }, 200
+            db.session.delete(like)
+            db.session.commit()
+
+            return {
+                "message": "Like removed successfully",
+                "likes_count": len(post.likes)
+            }, 200
