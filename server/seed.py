@@ -1,100 +1,65 @@
-#!/usr/bin/env python3
-
-# Standard library imports
-from random import randint, choice as rc
-
-# Remote library imports
+from app import app
+from models import db, User, Post, Comment, Like
+from werkzeug.security import generate_password_hash
 from faker import Faker
+import random
 
-# # Local imports
-# from app import app
-# from models import db, User, Post, Like, Comment,Follower
+fake = Faker()
 
-# if __name__ == '__main__':
-#     fake = Faker()
-#     with app.app_context():
-#         print("Starting seed...")
-#         # Seed code goes here!
-
-from app import app, db  # Import the app and db from your main app file
-from models import User, Post, Like, Comment # Import your models
-
-# Create the seed data
 def seed_data():
+    print("Dropping existing tables...")
+    db.drop_all()
+    print("Creating tables...")
+    db.create_all()
+
+    print("Seeding users...")
+    users = []
+    for _ in range(10):
+        user = User(
+            username=fake.user_name(),
+            email=fake.unique.email(),
+            password=generate_password_hash("password"),  # Default password for testing
+            bio=fake.sentence(nb_words=10),
+            profile_picture=fake.image_url()
+        )
+        users.append(user)
+        db.session.add(user)
+
+    db.session.commit()
+
+    print("Seeding posts...")
+    posts = []
+    for _ in range(20):
+        post = Post(
+            user=random.choice(users),
+            content=fake.text(max_nb_chars=200),
+            image=fake.image_url()
+        )
+        posts.append(post)
+        db.session.add(post)
+
+    db.session.commit()
+
+    print("Seeding comments...")
+    for _ in range(30):
+        comment = Comment(
+            user_id=random.choice(users).id,
+            post_id=random.choice(posts).id,
+            content=fake.sentence()
+        )
+        db.session.add(comment)
+
+    print("Seeding likes...")
+    for _ in range(40):
+        like = Like(
+            user_id=random.choice(users).id,
+            post_id=random.choice(posts).id
+        )
+        db.session.add(like)
+
+    db.session.commit()
+    print("Seeding complete!")
+
+if __name__ == '__main__':
     with app.app_context():
-        # Drop existing tables and recreate them
-        print("Dropping existing tables...")
-        db.drop_all()
-        print("Creating tables...")
-        db.create_all()
-
-        # Seed Users
-        print("Seeding users...")
-
-        user1 = User(
-            username="via_li",
-            email="via.li@gmail.com",
-            bio="Lover of life and all things beautiful.",
-            profile_picture="https://static1.personality-database.com/profile_images/0f55d14bbacc4128a949160c576ba6de.png"
-        )
-        user1._password_hash = "password123"
-
-        user2 = User(
-            username="Kelsey",
-            email="Kelsey@gmail.com",
-            bio="An aspiring data scientist exploring the world of AI and ML.",
-            profile_picture="data:image/jpeg;base64,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"
-        )
-        user2._password_hash = "password123"
-
-        user3 = User(
-            username="deb_sminkle",
-            email="deb.sminkle@gmail.com",
-            bio="Part-time gilf, full-time cat lady.",
-            profile_picture="data:image/jpeg;base64,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"
-        )
-        user3._password_hash = "password123"
-
-        db.session.add_all([user1, user2, user3])
-        db.session.commit()
-        print("Users added to the session.")
-
-
-        # Seed Posts
-        print("Seeding posts...")
-        post1 = Post(content="First rose of the season!", user_id=user1.id, image = "https://i.pinimg.com/originals/14/86/86/148686b4a830e06d8089db5cb1e521f4.jpg" )
-        post2 = Post(content="My fur baby!", user_id=user2.id, image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSimtZyskdR3y0AtCiHyEebU1o7mZQFOA6F0Q&s")
-        post3 = Post(content="OOTD!", user_id=user3.id, image = "https://i.pinimg.com/736x/09/56/cd/0956cde2f34c21cca779f52f4ce5c786.jpg")
-
-        db.session.add_all([post1, post2, post3])
-        db.session.commit()
-        print("Posts added to the session.")
-
-        # Seed Likes
-        print("Seeding likes...")
-        like1 = Like(user_id=user1.id, post_id=post2.id)  # User1 likes User2's post
-        like2 = Like(user_id=user2.id, post_id=post3.id)  # User2 likes User3's post
-        like3 = Like(user_id=user3.id, post_id=post1.id)  # User3 likes User1's post
-
-        db.session.add_all([like1, like2, like3])
-        db.session.commit()
-        print("Likes added to the session.")
-
-        # Seed Comments
-        print("Seeding comments...")
-        comment1 = Comment(content="Nice post!", user_id=user1.id, post_id=post2.id)
-        comment2 = Comment(content="Awesome!", user_id=user2.id, post_id=post3.id)
-        comment3 = Comment(content="Great thoughts!", user_id=user3.id, post_id=post1.id)
-
-        db.session.add_all([comment1, comment2, comment3])
-        db.session.commit()
-        print("Comments added to the session.")
-
-
-# Run the seed function
-if __name__ == "__main__":
-    print("Starting the seeding process...")
-    seed_data()
-    print("Seeding process complete!")
-
-        
+        seed_data()

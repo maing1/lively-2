@@ -77,7 +77,7 @@ const Feed = () => {
 
   return (
     <div className="container mt-5">
-      <h2 className="mb-4">Feed</h2>
+      <h2 className="text-center">Feed</h2>
       {posts.length === 0 ? (
         <div className="card">
           <div className="card-body text-center text-muted">

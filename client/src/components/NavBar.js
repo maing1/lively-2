@@ -39,7 +39,7 @@ const NavBar = () => {
     return (
         <nav className="navbar">
             <div className="navbar-container">
-                <Link to="/" className="navbar-brand">NavBar</Link>
+                <Link to="/" className="navbar-brand">Lively</Link>
                 <div className="nav-links">
                     {!isAuthenticated ? (
                         <>
