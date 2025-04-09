@@ -51,3 +51,30 @@ def init_post_route(app):
         db.session.commit()
 
         return {"message": "Post deleted successfully"}, 200
+    
+    @app.route('/posts/<int:post_id>', methods=['PATCH'])
+    @jwt_required()
+    def update_post(post_id):
+        user_id = get_jwt_identity()
+        post = db.session.get(Post, post_id)
+
+        if not post:
+            return {"message": "Post not found"}, 404
+        
+        data = request.get_json()
+        content = data.get('content')
+
+        if content:
+            post.content = content
+
+        db.session.commit()
+
+        return {
+            "message": "Post updated successfully",
+            "post": {
+                "id": post.id,
+                "content": post.content,
+                "image": post.image,
+                "user_id": post.user_id
+            }
+        }, 200
